@@ -13,5 +13,10 @@ module.exports = {
         BAD_REQUEST:400,
         FORBIDDEN:401,
         SERVER_ERROR:500
+    },
+
+    ERROR_MESSAGE:{
+        CUSTOM_HEADERS:"Custom headers are not supplied",
+        EMPTY_BODY: "Request body is empty"
     }
 }

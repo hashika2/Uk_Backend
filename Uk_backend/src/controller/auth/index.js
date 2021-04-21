@@ -1,7 +1,6 @@
-'use strict';
-
+"use strict";
 const { Register } = require("./Auth");
 
-module.exports.register = async (event,context) => {
-  return Register(event)
+module.exports.register = async (event) => {
+  return Register(event);
 };

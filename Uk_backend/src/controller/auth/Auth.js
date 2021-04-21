@@ -1,14 +1,32 @@
+const { STATUS_CODE, ERROR_MESSAGE } = require("../../shared/constant");
+const { responseBuilder } = require("../../shared/responseBuilder");
 const { validateHeader } = require("../../shared/validateHeaders");
+const { validateRegisterAttributes } = require("./authAttributesValidation");
 
 const Register = (event) => {
   const validity = validateHeader(event);
   if (!validity) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: "Custom headers are not supplied",
-      }),
-    };
+    return responseBuilder(
+      STATUS_CODE.BAD_REQUEST,
+      ERROR_MESSAGE.CUSTOM_HEADERS
+    );
+  }
+
+  const requestBody = JSON.parse(event.body);
+  const { username, email, password } = requestBody;
+  if (!requestBody || Object.keys(requestBody).length === 0) {
+    return responseBuilder(STATUS_CODE.BAD_REQUEST, ERROR_MESSAGE.EMPTY_BODY);
+  }
+  const validateResult = validateRegisterAttributes({
+    username,
+    email,
+    password,
+  });
+  if (validateResult.error) {
+    return responseBuilder(
+      STATUS_CODE.BAD_REQUEST,
+      validateResult.error.details[0].message
+    );
   }
   return {
     statusCode: 200,
