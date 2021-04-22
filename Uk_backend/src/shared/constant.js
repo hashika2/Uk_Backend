@@ -18,5 +18,9 @@ module.exports = {
     ERROR_MESSAGE:{
         CUSTOM_HEADERS:"Custom headers are not supplied",
         EMPTY_BODY: "Request body is empty"
+    },
+
+    TABLES:{
+        USER:'User'
     }
 }
