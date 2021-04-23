@@ -17,6 +17,10 @@ const userEntity = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      username: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
       companyName: {
         type: DataTypes.STRING(255),
         allowNull: false,
@@ -26,7 +30,7 @@ const userEntity = (sequelize, DataTypes) => {
         allowNull: false,
       },
       email: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING(100),
         allowNull: false,
       },
       phoneNumber: {
@@ -34,15 +38,15 @@ const userEntity = (sequelize, DataTypes) => {
         allowNull: false,
       },
       password: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING(100),
         allowNull: false,
       },
     },
     {
       freezeTableName: true,
       defaultScope: {
-        attributes: { exclude: ['createdAt', 'updatedAt'] }
-      }
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
     }
   );
 };

@@ -21,6 +21,6 @@ module.exports = {
     },
 
     TABLES:{
-        USER:'User'
+        USER:'user'
     }
 }

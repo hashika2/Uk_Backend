@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const databaseEnv = require("../environment/env.json");
+const databaseEnv = require("../environment");
 const userEntity = require("./userEntity");
 
 const sequelize = new Sequelize(
@@ -7,10 +7,10 @@ const sequelize = new Sequelize(
   databaseEnv.user,
   databaseEnv.password,
   {
-    dialect: 'mysql',
+    dialect: "mysql",
     dialectOptions: {
       supportBigNumbers: true,
-      decimalNumbers: true
+      decimalNumbers: true,
     },
     host: databaseEnv.host,
     port: databaseEnv.port,

@@ -35,7 +35,7 @@ const Register = (event) => {
       validateResult.error.details[0].message
     );
   }
-  return RegisterService(email, password, username);
+  return RegisterService(requestBody);
 };
 
 const Login = async (event) => {

@@ -1,7 +1,24 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
+const { createUser } = require("../shared/repositories/UserRepo");
 
-const RegisterService = async (email, password, username) => {
+const RegisterService = async ({
+  email,
+  password,
+  username,
+  company,
+  address,
+  phone,
+}) => {
   try {
+    // check mail is already exist
+    const signIn = await createUser(
+      email,
+      password,
+      username,
+      company,
+      address,
+      phone
+    );
     /** sign up with aws cognito  **/
     const poolData = {
       ClientId: "6ecinkimcnl43l5mfc60dfv1f0",
@@ -32,7 +49,6 @@ const RegisterService = async (email, password, username) => {
         body: JSON.stringify(data.user),
       };
     });
-    
   } catch (error) {
     console.log(error);
     return error;
@@ -58,46 +74,62 @@ const LoginService = async (email, password) => {
     };
 
     /** signIn with aws cognito and get token **/
-      const authenticationDetails = new AmozonCognitoIdentity.AuthenticationDetails(
-        authenticationData
-      );
-      const poolData = {
-        ClientId: "6ecinkimcnl43l5mfc60dfv1f0",
-        UserPoolId: "us-east-1_Na6ojbUpd",
-      };
-      const userPool = new AmozonCognitoIdentity.CognitoUserPool(poolData);
-      console.log("***********");
-  
-      const userData = {
-        Username: email,
-        Pool: userPool,
-      };
-      const cognitoUser = new AmozonCognitoIdentity.CognitoUser(userData);
-      console.log(authenticationDetails);
-  
-      cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: function (session) {
-          const tokens = { 
-            accessToken: session.getAccessToken().getJwtToken(),
-            idToken: session.getIdToken().getJwtToken(),
-            refreshToken: session.getRefreshToken().getToken(),
-          };
-          cognitoUser["tokens"] = tokens; // Save tokens for later use
-          // console.log(cognitoUser.signInUserSession);
-          return {
-            statusCode: 200,
-            body: JSON.stringify(cognitoUser.signInUserSession),
-          };
-          // return res.send(cognitoUser.signInUserSession); // Resolve user
+    const authenticationDetails = new AmozonCognitoIdentity.AuthenticationDetails(
+      authenticationData
+    );
+    const poolData = {
+      ClientId: "6ecinkimcnl43l5mfc60dfv1f0",
+      UserPoolId: "us-east-1_Na6ojbUpd",
+    };
+    const userPool = new AmozonCognitoIdentity.CognitoUserPool(poolData);
+    const userData = {
+      Username: email,
+      Pool: userPool,
+    };
+    const cognitoUser = new AmozonCognitoIdentity.CognitoUser(userData);
+    console.log(authenticationDetails);
+
+    /* cognitoUser.forgotPassword({
+        onSuccess:data=>{
+          console.log(data);
         },
-        onFailure: function (err) {
-          return {
-            statusCode: 500,
-            body: err,
-          };
-          // return res.send(err); // Reject out errors
+        onFailure:err=>{
+          console.log(err)
+        }
+      }) */
+
+    /*cognitoUser.confirmPassword(code,password,{
+        onSuccess:data=>{
+          console.log(data)
         },
-      });
+        onFailure:err=>{
+          console.log(err)
+        }
+      })*/
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: function (session) {
+        const tokens = {
+          accessToken: session.getAccessToken().getJwtToken(),
+          idToken: session.getIdToken().getJwtToken(),
+          refreshToken: session.getRefreshToken().getToken(),
+        };
+        cognitoUser["tokens"] = tokens; // Save tokens for later use
+        // console.log(cognitoUser.signInUserSession);
+        return {
+          statusCode: 200,
+          body: JSON.stringify(cognitoUser.signInUserSession),
+        };
+        // return res.send(cognitoUser.signInUserSession); // Resolve user
+      },
+      onFailure: function (err) {
+        return {
+          statusCode: 500,
+          body: err,
+        };
+        // return res.send(err); // Reject out errors
+      },
+    });
   } catch (error) {
     console.log(error);
   }
