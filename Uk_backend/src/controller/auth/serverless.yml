@@ -26,6 +26,17 @@ functions:
           headers:
             - content-type
 
+  login:
+    handler: index.login
+    events:
+      - http:
+          path: auth/login
+          method: post
+          cors:
+          origin: '*'
+          headers:
+            - content-type
+
 # you can add CloudFormation resource templates here
 resources:
   Resources:
