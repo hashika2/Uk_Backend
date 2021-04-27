@@ -1,4 +1,5 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
+const passwordHash = require('password-hash');
 const { STATUS_CODE } = require("../shared/constant");
 const { ClientId, UserPoolId } = require("../shared/environment/env.json");
 const {
@@ -10,7 +11,6 @@ const poolData = {
   ClientId: ClientId,
   UserPoolId: UserPoolId,
 };
-
 const RegisterService = async ({
   email,
   password,
@@ -30,9 +30,10 @@ const RegisterService = async ({
         }),
       };
     }
+    const hashPassword = passwordHash.generate(password);
     const signIn = await createUser(
       email,
-      password,
+      hashPassword,
       username,
       company,
       address,
