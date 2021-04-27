@@ -62,9 +62,8 @@ const Login = async (event) => {
       validateResult.error.details[0].message
     );
   }
-  const res = await LoginService(email, password);
-  console.log(res);
-  return res;
+    
+  return LoginService(email, password);
 };
 
 module.exports = { Register, Login };

@@ -10,6 +10,7 @@ module.exports = {
       },
 
     STATUS_CODE:{
+        SUCCESS:200,
         BAD_REQUEST:400,
         FORBIDDEN:401,
         SERVER_ERROR:500

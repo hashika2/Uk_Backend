@@ -20,4 +20,10 @@ const createUser = async (
   return user;
 };
 
-module.exports = { createUser };
+const checkUserExist = async (email) => {
+  const isExist = await User.count({ where: { email: email } });
+  if (isExist > 0) return false;
+  else return true;
+};
+
+module.exports = { createUser, checkUserExist };
