@@ -39,7 +39,15 @@ const RegisterService = async ({
       address,
       phone
     );
-    console.log(signIn)
+
+    if(!signIn.isNewRecord){
+      return {
+        statusCode: STATUS_CODE.SERVER_ERROR,
+        body: JSON.stringify({
+          error: "User is not added to database",
+        }),
+      };
+    }
 
     /** sign up with aws cognito  **/
     let attributeList = [];
