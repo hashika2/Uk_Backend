@@ -1,5 +1,15 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
-const { createUser } = require("../shared/repositories/UserRepo");
+const { STATUS_CODE } = require("../shared/constant");
+const { ClientId, UserPoolId } = require("../shared/environment/env.json");
+const {
+  createUser,
+  checkUserExist,
+} = require("../shared/repositories/UserRepo");
+
+const poolData = {
+  ClientId: ClientId,
+  UserPoolId: UserPoolId,
+};
 
 const RegisterService = async ({
   email,
@@ -11,6 +21,15 @@ const RegisterService = async ({
 }) => {
   try {
     // check mail is already exist
+    const isExist = await checkUserExist(email);
+    if (!isExist) {
+      return {
+        statusCode: STATUS_CODE.BAD_REQUEST,
+        body: JSON.stringify({
+          error: "User Already Exist",
+        }),
+      };
+    }
     const signIn = await createUser(
       email,
       password,
@@ -19,11 +38,9 @@ const RegisterService = async ({
       address,
       phone
     );
+    console.log(signIn)
+
     /** sign up with aws cognito  **/
-    const poolData = {
-      ClientId: "6ecinkimcnl43l5mfc60dfv1f0",
-      UserPoolId: "us-east-1_Na6ojbUpd",
-    };
     let attributeList = [];
     const userPool = new AmozonCognitoIdentity.CognitoUserPool(poolData);
     const emailData = {
@@ -34,36 +51,23 @@ const RegisterService = async ({
       emailData
     );
     attributeList.push(emailAttribues);
-    console.log(emailAttribues);
-    userPool.signUp(email, password, attributeList, null, (err, data) => {
-      if (err) {
-        console.log(err);
-        return {
-          statusCode: 500,
-          body: JSON.stringify(err),
-        };
-      }
-      console.log(data.user);
-      return {
-        statusCode: 200,
-        body: JSON.stringify(data.user),
-      };
-    });
+    return {
+      body: JSON.stringify(
+        await new Promise((resolve, reject) => {
+          userPool.signUp(email, password, attributeList, null, (err, data) => {
+            if (err) {
+              console.log(err);
+              reject(err);
+            }
+            resolve(data.user);
+          });
+        })
+      ),
+    };
   } catch (error) {
     console.log(error);
     return error;
   }
-  //   return {
-  //     statusCode: 200,
-  //     body: JSON.stringify(
-  //       {
-  //         message: "Go Serverless v1.0! Your function executed successfully!",
-  //         input: event,
-  //       },
-  //       null,
-  //       2
-  //     ),
-  //   };
 };
 
 const LoginService = async (email, password) => {
@@ -77,17 +81,12 @@ const LoginService = async (email, password) => {
     const authenticationDetails = new AmozonCognitoIdentity.AuthenticationDetails(
       authenticationData
     );
-    const poolData = {
-      ClientId: "6ecinkimcnl43l5mfc60dfv1f0",
-      UserPoolId: "us-east-1_Na6ojbUpd",
-    };
     const userPool = new AmozonCognitoIdentity.CognitoUserPool(poolData);
     const userData = {
       Username: email,
       Pool: userPool,
     };
     const cognitoUser = new AmozonCognitoIdentity.CognitoUser(userData);
-    console.log(authenticationDetails);
 
     /* cognitoUser.forgotPassword({
         onSuccess:data=>{
@@ -107,31 +106,33 @@ const LoginService = async (email, password) => {
         }
       })*/
 
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: function (session) {
-        const tokens = {
-          accessToken: session.getAccessToken().getJwtToken(),
-          idToken: session.getIdToken().getJwtToken(),
-          refreshToken: session.getRefreshToken().getToken(),
-        };
-        cognitoUser["tokens"] = tokens; // Save tokens for later use
-        // console.log(cognitoUser.signInUserSession);
-        return {
-          statusCode: 200,
-          body: JSON.stringify(cognitoUser.signInUserSession),
-        };
-        // return res.send(cognitoUser.signInUserSession); // Resolve user
-      },
-      onFailure: function (err) {
-        return {
-          statusCode: 500,
-          body: err,
-        };
-        // return res.send(err); // Reject out errors
-      },
-    });
+    return {
+      body: JSON.stringify(
+        await new Promise((resolve, reject) => {
+          cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: function (session) {
+              const tokens = {
+                accessToken: session.getAccessToken().getJwtToken(),
+                idToken: session.getIdToken().getJwtToken(),
+                refreshToken: session.getRefreshToken().getToken(),
+              };
+              cognitoUser["tokens"] = tokens; // Save tokens for later use
+              console.log(cognitoUser.signInUserSession.idToken);
+              resolve(cognitoUser.signInUserSession.idToken);
+              // return cognitoUser.signInUserSession;
+            },
+            onFailure: function (err) {
+              reject(err);
+            },
+          });
+        })
+      ),
+    };
   } catch (error) {
-    console.log(error);
+    return {
+      body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
   }
 };
 
