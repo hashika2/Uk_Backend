@@ -5,7 +5,7 @@ const {
   validateRegisterAttributes,
   validateLoginAttributes,
 } = require("./authAttributesValidation");
-const { RegisterService, LoginService } = require("../../services/AuthService");
+const { RegisterService, LoginService, ForgetPasswordService } = require("../../services/AuthService");
 
 const Register = (event) => {
   const validity = validateHeader(event);
@@ -66,4 +66,31 @@ const Login = async (event) => {
   return LoginService(email, password);
 };
 
-module.exports = { Register, Login };
+const ForgotPassword =(event)=>{
+  const validity = validateHeader(event);
+  if (!validity) {
+    return responseBuilder(
+      STATUS_CODE.BAD_REQUEST,
+      ERROR_MESSAGE.CUSTOM_HEADERS
+    );
+  }
+
+  const requestBody = JSON.parse(event.body);
+  const { email } = requestBody;
+  if (!requestBody || Object.keys(requestBody).length === 0) {
+    return responseBuilder(STATUS_CODE.BAD_REQUEST, ERROR_MESSAGE.EMPTY_BODY);
+  }
+  // const validateResult = validateLoginAttributes({
+  //   email,
+  // });
+  // if (validateResult.error) {
+  //   return responseBuilder(
+  //     STATUS_CODE.BAD_REQUEST,
+  //     validateResult.error.details[0].message
+  //   );
+  // }
+
+  return ForgetPasswordService(email)
+}
+
+module.exports = { Register, Login, ForgotPassword };

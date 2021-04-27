@@ -36,6 +36,17 @@ functions:
           origin: '*'
           headers:
             - content-type
+  
+  forgotPassword:
+    handler: index.forgotPassword
+    events:
+      - http:
+          path: auth/forgotPassword
+          method: post
+          cors:
+          origin: '*'
+          headers:
+            - content-type
 
 # you can add CloudFormation resource templates here
 resources:
