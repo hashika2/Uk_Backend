@@ -48,6 +48,17 @@ functions:
           headers:
             - content-type
 
+  confirmPassword:
+    handler: index.confirmPassword
+    events:
+      - http:
+          path: auth/confirmPassword
+          method: post
+          cors:
+          origin: '*'
+          headers:
+            - content-type
+
 # you can add CloudFormation resource templates here
 resources:
   Resources:

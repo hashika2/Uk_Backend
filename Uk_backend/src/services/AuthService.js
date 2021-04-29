@@ -40,14 +40,14 @@ const RegisterService = async ({
       phone
     );
 
-    if (!signIn.isNewRecord) {
-      return {
-        statusCode: STATUS_CODE.SERVER_ERROR,
-        body: JSON.stringify({
-          error: "User is not added to database",
-        }),
-      };
-    }
+    // if (!signIn.isNewRecord) {
+    //   return {
+    //     statusCode: STATUS_CODE.SERVER_ERROR,
+    //     body: JSON.stringify({
+    //       error: "User is not added to database",
+    //     }),
+    //   };
+    // }
 
     /** sign up with aws cognito  **/
     let attributeList = [];
@@ -56,8 +56,13 @@ const RegisterService = async ({
       Name: "email",
       Value: email,
     };
+    const companyData = {
+      Name:"companyName",
+      Value:company
+    }
     const emailAttribues = new AmozonCognitoIdentity.CognitoUserAttribute(
-      emailData
+      emailData,
+      companyData
     );
     attributeList.push(emailAttribues);
     return {
@@ -187,4 +192,36 @@ const ForgetPasswordService = async (email) => {
   }
 };
 
-module.exports = { RegisterService, LoginService, ForgetPasswordService };
+const ConfirmPasswordService = async (password,code,email) => {
+  try {
+    const userPool = new AmozonCognitoIdentity.CognitoUserPool(poolData);
+    const userData = {
+      Username: email,
+      Pool: userPool,
+    };
+    const cognitoUser = new AmozonCognitoIdentity.CognitoUser(userData);
+    return {
+      body: JSON.stringify(
+        await new Promise(
+          (resolve,reject) => {
+            cognitoUser.confirmPassword(code,password,{
+                  onSuccess:data=>{
+                    console.log(data)
+                    resolve(data)
+                  },
+                  onFailure:err=>{
+                    console.log(err)
+                    reject(err)
+                  }
+                })
+          })
+      ),
+    };
+  } catch (error) {
+    return {
+      body: JSON.stringify(error),
+    };
+  }
+};
+
+module.exports = { RegisterService, LoginService, ForgetPasswordService, ConfirmPasswordService };
