@@ -113,7 +113,6 @@ const LoginService = async (email, password) => {
                 refreshToken: session.getRefreshToken().getToken(),
               };
               cognitoUser["tokens"] = tokens; // Save tokens for later use
-              console.log(cognitoUser.signInUserSession.idToken);
               resolve(cognitoUser.signInUserSession.idToken);
               // return cognitoUser.signInUserSession;
             },
