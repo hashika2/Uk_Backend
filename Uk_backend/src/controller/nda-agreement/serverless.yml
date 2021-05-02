@@ -7,6 +7,13 @@ service: nda
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
 
+custom:
+  webpack:
+    webpackConfig: '../../../webpack.config.js'   # Name of webpack configuration file
+    includeModules: false   # Node modules configuration for packaging
+    packager: 'npm'   # Packager that will be used to package your external modules
+    # excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -42,3 +49,4 @@ resources:
 
 plugins:
   - serverless-offline
+  - serverless-webpack

@@ -1,15 +1,20 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
 const passwordHash = require("password-hash");
 const { STATUS_CODE } = require("../shared/constant");
-const { ClientId, UserPoolId } = require("../shared/environment/env.json");
+const {
+  ClientId,
+  UserPoolId,
+  ClientIdExtend,
+  UserPoolIdExtend,
+} = require("../shared/environment/env.json");
 const {
   createUser,
   checkUserExist,
 } = require("../shared/repositories/UserRepo");
 
 const poolData = {
-  ClientId: ClientId,
-  UserPoolId: UserPoolId,
+  ClientId: ClientIdExtend,
+  UserPoolId: UserPoolIdExtend,
 };
 const RegisterService = async ({
   email,
@@ -57,14 +62,21 @@ const RegisterService = async ({
       Value: email,
     };
     const companyData = {
-      Name:"companyName",
-      Value:company
-    }
+      Name: "companyName",
+      Value: company,
+    };
     const emailAttribues = new AmozonCognitoIdentity.CognitoUserAttribute(
       emailData,
-      companyData
     );
+    const addressAttribute = new AmozonCognitoIdentity.CognitoUserAttribute( { Name: "address", Value: address })
+    const phoneAttribute = new AmozonCognitoIdentity.CognitoUserAttribute( { Name: "phone_number", Value: phone })
+    const nameAttribute = new AmozonCognitoIdentity.CognitoUserAttribute( { Name: "name", Value: username })
+    const companyAttribute = new AmozonCognitoIdentity.CognitoUserAttribute(  { Name: "custom:company", Value: company })
     attributeList.push(emailAttribues);
+    attributeList.push(addressAttribute);
+    attributeList.push(phoneAttribute);
+    attributeList.push(nameAttribute);
+    attributeList.push(companyAttribute);
     return {
       body: JSON.stringify(
         await new Promise((resolve, reject) => {
@@ -72,8 +84,9 @@ const RegisterService = async ({
             if (err) {
               console.log(err);
               reject(err);
+            } else {
+              resolve(data.user);
             }
-            resolve(data.user);
           });
         })
       ),
@@ -113,7 +126,7 @@ const LoginService = async (email, password) => {
                 refreshToken: session.getRefreshToken().getToken(),
               };
               cognitoUser["tokens"] = tokens; // Save tokens for later use
-              resolve(cognitoUser.signInUserSession.idToken);
+              resolve(cognitoUser.signInUserSession);
               // return cognitoUser.signInUserSession;
             },
             onFailure: function (err) {
@@ -150,29 +163,28 @@ const ForgetPasswordService = async (email) => {
     const cognitoUser = new AmozonCognitoIdentity.CognitoUser(userData);
     return {
       body: JSON.stringify(
-        await new Promise(
-          (resolve,reject) => {
-            cognitoUser.forgotPassword({
-              onSuccess: (data) => {
-                console.log(data);
-                resolve(data.CodeDeliveryDetails);
-              },
-              onFailure: (err) => {
-                reject(err);
-                console.log(err);
-              },
-              // inputVerificationCode(){
-              //   cognitoUser.confirmPassword(code,password,{
-              //     onSuccess:data=>{
-              //       console.log(data)
-              //     },
-              //     onFailure:err=>{
-              //       console.log(err)
-              //     }
-              //   })
-              // }
-            });
-          })
+        await new Promise((resolve, reject) => {
+          cognitoUser.forgotPassword({
+            onSuccess: (data) => {
+              console.log(data);
+              resolve(data.CodeDeliveryDetails);
+            },
+            onFailure: (err) => {
+              reject(err);
+              console.log(err);
+            },
+            // inputVerificationCode(){
+            //   cognitoUser.confirmPassword(code,password,{
+            //     onSuccess:data=>{
+            //       console.log(data)
+            //     },
+            //     onFailure:err=>{
+            //       console.log(err)
+            //     }
+            //   })
+            // }
+          });
+        })
       ),
     };
 
@@ -191,7 +203,7 @@ const ForgetPasswordService = async (email) => {
   }
 };
 
-const ConfirmPasswordService = async (password,code,email) => {
+const ConfirmPasswordService = async (password, code, email) => {
   try {
     const userPool = new AmozonCognitoIdentity.CognitoUserPool(poolData);
     const userData = {
@@ -201,19 +213,18 @@ const ConfirmPasswordService = async (password,code,email) => {
     const cognitoUser = new AmozonCognitoIdentity.CognitoUser(userData);
     return {
       body: JSON.stringify(
-        await new Promise(
-          (resolve,reject) => {
-            cognitoUser.confirmPassword(code,password,{
-                  onSuccess:data=>{
-                    console.log(data)
-                    resolve(data)
-                  },
-                  onFailure:err=>{
-                    console.log(err)
-                    reject(err)
-                  }
-                })
-          })
+        await new Promise((resolve, reject) => {
+          cognitoUser.confirmPassword(code, password, {
+            onSuccess: (data) => {
+              console.log(data);
+              resolve(data);
+            },
+            onFailure: (err) => {
+              console.log(err);
+              reject(err);
+            },
+          });
+        })
       ),
     };
   } catch (error) {
@@ -223,4 +234,9 @@ const ConfirmPasswordService = async (password,code,email) => {
   }
 };
 
-module.exports = { RegisterService, LoginService, ForgetPasswordService, ConfirmPasswordService };
+module.exports = {
+  RegisterService,
+  LoginService,
+  ForgetPasswordService,
+  ConfirmPasswordService,
+};

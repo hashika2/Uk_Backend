@@ -19,5 +19,9 @@
     "request": "^2.88.2",
     "sequelize": "^6.6.2",
     "serverless-offline": "^6.9.0"
+  },
+  "devDependencies": {
+    "serverless-webpack": "^5.4.2",
+    "webpack": "^5.36.2"
   }
 }

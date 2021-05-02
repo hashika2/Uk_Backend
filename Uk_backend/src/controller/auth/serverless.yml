@@ -3,9 +3,14 @@ service: auth
 #app: your-app-name
 #org: your-org-name
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-# frameworkVersion: "=X.X.X"
+# You can pin your service to only deplo
+
+custom:
+  webpack:
+    webpackConfig: '../../../webpack.config.js'   # Name of webpack configuration file
+    includeModules: false   # Node modules configuration for packaging
+    packager: 'npm'   # Packager that will be used to package your external modules
+    # excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
 
 provider:
   name: aws
@@ -74,3 +79,7 @@ resources:
 
 plugins:
   - serverless-offline
+  - serverless-webpack
+
+package:
+  individually: true
