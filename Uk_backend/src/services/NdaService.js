@@ -1,4 +1,5 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
+const { STATUS_CODE } = require("../shared/constant");
 const {
   ClientIdExtend,
   UserPoolIdExtend,
@@ -12,9 +13,7 @@ const poolData = {
 
 const NdaService = async (email) => {
   try {
-
     const userDetails = await getUserDetails(email);
-    console.log(userDetails)
     return {
       body:JSON.stringify(userDetails)
     };
@@ -38,7 +37,8 @@ const NdaService = async (email) => {
     });
   } catch (error) {
     return {
-      body: JSON.stringify(error)
+      body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR
     }
   }
 };

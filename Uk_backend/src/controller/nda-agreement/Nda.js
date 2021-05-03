@@ -16,12 +16,12 @@ const Nda = async (event) => {
     const { email } = event.queryStringParameters;
     // check autherization
     const autherize = await authorizationService(event);
-
-    if (!autherize.email == email) {
+    if (autherize.statusCode == 500) {
       return {
         body: JSON.stringify({
           error: "UnAutherized",
         }),
+        statusCode:STATUS_CODE.UNAUTHERIZED
       };
     }
     return await NdaService(email);
