@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint **/*.js --ignore-pattern node_modules/ --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -18,7 +19,9 @@
     "password-hash": "^1.2.2",
     "request": "^2.88.2",
     "sequelize": "^6.6.2",
-    "serverless-offline": "^6.9.0"
+    "serverless-offline": "^6.9.0",
+    "verify-cognito-token": "^1.2.4",
+    "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "serverless-webpack": "^5.4.2",

@@ -2,6 +2,7 @@ const { User } = require("../entities");
 
 const createUser = async (
   email,
+  clientId,
   password,
   username,
   company,
@@ -11,6 +12,7 @@ const createUser = async (
   const user = await User.create({
     username: username,
     email: email,
+    userId:clientId,
     password: password,
     companyName: company,
     companyAddress: address,

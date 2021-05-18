@@ -1,6 +1,7 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
 const passwordHash = require("password-hash");
 const { STATUS_CODE } = require("../shared/constant");
+const { user } = require("../shared/environment");
 const {
   ClientId,
   UserPoolId,
@@ -35,24 +36,6 @@ const RegisterService = async ({
         }),
       };
     }
-    const hashPassword = passwordHash.generate(password);
-    const signIn = await createUser(
-      email,
-      hashPassword,
-      username,
-      company,
-      address,
-      phone
-    );
-
-    // if (!signIn.isNewRecord) {
-    //   return {
-    //     statusCode: STATUS_CODE.SERVER_ERROR,
-    //     body: JSON.stringify({
-    //       error: "User is not added to database",
-    //     }),
-    //   };
-    // }
 
     /** sign up with aws cognito  **/
     let attributeList = [];
@@ -80,11 +63,32 @@ const RegisterService = async ({
     return {
       body: JSON.stringify(
         await new Promise((resolve, reject) => {
-          userPool.signUp(email, password, attributeList, null, (err, data) => {
+          userPool.signUp(email, password, attributeList, null, async (err, data) => {
             if (err) {
               console.log(err);
               reject(err);
             } else {
+              const hashPassword = passwordHash.generate(password);
+              console.log(`************${data.user.pool.clientId}`)
+              const clientId = data.user.pool.clientId;
+              const signIn = await createUser(
+                email,
+                clientId,
+                hashPassword,
+                username,
+                company,
+                address,
+                phone
+              );
+
+              // if (!signIn.isNewRecord) {
+              //   return {
+              //     statusCode: STATUS_CODE.SERVER_ERROR,
+              //     body: JSON.stringify({
+              //       error: "User is not added to database",
+              //     }),
+              //   };
+              // }
               resolve(data.user);
             }
           });
@@ -125,8 +129,11 @@ const LoginService = async (email, password) => {
                 idToken: session.getIdToken().getJwtToken(),
                 refreshToken: session.getRefreshToken().getToken(),
               };
-              cognitoUser["tokens"] = tokens; // Save tokens for later use
-              resolve(cognitoUser.signInUserSession);
+              cognitoUser["tokens"] = tokens; // Save tokens for later use  2lkjm717aaenjk1gaplh9pql8t
+              resolve({                                                     
+                accessToken: cognitoUser.signInUserSession.accessToken,
+                refreshToken: cognitoUser.signInUserSession.refreshToken
+              });
               // return cognitoUser.signInUserSession;
             },
             onFailure: function (err) {
