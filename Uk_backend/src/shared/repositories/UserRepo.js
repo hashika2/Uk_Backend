@@ -28,8 +28,8 @@ const checkUserExist = async (email) => {
   else return true;
 };
 
-const getUserDetails = async(email)=>{
-  return await User.findOne({where:{email:email}})
+const getUserDetails = async(email,id)=>{
+  return await User.findOne({where:{userId:id}})
 }
 
 module.exports = { createUser, checkUserExist, getUserDetails };

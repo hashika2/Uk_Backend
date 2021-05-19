@@ -1,4 +1,4 @@
-service: nda-details
+service: date
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -24,12 +24,12 @@ provider:
     STAGE: ${self:provider.stage}
 
 functions:
-  ndaDetails:
-    handler: index.ndaDetails
+  setDate:
+    handler: index.setDate
     events:
       - http:
-          path: nda/nda
-          method: get
+          path: book/date
+          method: post
           cors:
           origin: '*'
           headers:

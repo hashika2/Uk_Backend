@@ -23,6 +23,7 @@ module.exports = {
     },
 
     TABLES:{
-        USER:'user'
+        USER:'user',
+        USER_BOOKING: 'user_booking'
     }
 }

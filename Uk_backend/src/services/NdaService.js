@@ -11,9 +11,9 @@ const poolData = {
   UserPoolId: UserPoolIdExtend,
 };
 
-const NdaService = async (email) => {
+const NdaService = async (email,id) => {
   try {
-    const userDetails = await getUserDetails(email);
+    const userDetails = await getUserDetails(email,id);
     return {
       body:JSON.stringify(userDetails)
     };

@@ -13,18 +13,18 @@ const Nda = async (event) => {
         ERROR_MESSAGE.CUSTOM_HEADERS
       );
     }
-    const { email } = event.queryStringParameters;
+    const { email,id } = event.queryStringParameters;
     // check autherization
-    const autherize = await authorizationService(event);
-    if (autherize.statusCode == 500) {
-      return {
-        body: JSON.stringify({
-          error: "UnAutherized",
-        }),
-        statusCode:STATUS_CODE.UNAUTHERIZED
-      };
-    }
-    return await NdaService(email);
+    // const autherize = await authorizationService(event);
+    // if (!autherize.statusCode == 200) {
+    //   return {
+    //     body: JSON.stringify({
+    //       error: "UnAutherized",
+    //     }),
+    //     statusCode:STATUS_CODE.UNAUTHERIZED
+    //   };
+    // }
+    return await NdaService(email,id);
   } catch (error) {
     return {
       body: JSON.stringify(error),
