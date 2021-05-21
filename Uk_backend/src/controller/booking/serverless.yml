@@ -1,15 +1,17 @@
-service: auth
+service: date
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
 
-# You can pin your service to only deplo
-
 custom:
+  envFilePath: ../../../shared/environment/env.json
   webpack:
     webpackConfig: '../../../webpack.config.js'   # Name of webpack configuration file
-    includeModules: false   # Node modules configuration for packaging
-    packager: 'yarn'   # Packager that will be used to package your external modules
+    includeModules:
+      packagePath: ../../../package.json
+      forceExclude:
+        - aws-sdk   # Node modules configuration for packaging
+    packager: 'npm'   # Packager that will be used to package your external modules
     # excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
 
 provider:
@@ -18,51 +20,38 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: us-east-1
+  environment:
+    STAGE: ${self:provider.stage}
+  iamRoleStatments:
+    - Effect: Allow
+    - Action: 
+        - s3:*
+        - ses:*
 
 functions:
-  register:
-    handler: index.register
+  setDate:
+    handler: index.setDate
     events:
       - http:
-          path: auth/register
-          method: post
+          path: book/date
+          method: get
           cors:
           origin: '*'
           headers:
             - content-type
+            - authorization
 
-  login:
-    handler: index.login
+  sendEmail:
+    handler: index.sendEmail
     events:
       - http:
-          path: auth/login
+          path: book/email
           method: post
           cors:
           origin: '*'
           headers:
             - content-type
-  
-  forgotPassword:
-    handler: index.forgotPassword
-    events:
-      - http:
-          path: auth/forgotPassword
-          method: post
-          cors:
-          origin: '*'
-          headers:
-            - content-type
-
-  confirmPassword:
-    handler: index.confirmPassword
-    events:
-      - http:
-          path: auth/confirmPassword
-          method: post
-          cors:
-          origin: '*'
-          headers:
-            - content-type
+            - authorization
 
 # you can add CloudFormation resource templates here
 resources:
@@ -72,7 +61,7 @@ resources:
       Properties:
         ResponseParameters:
           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-          gatewayresponse.header.Access-Control-Allow-Headers: "'content-type'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'content-type,authorization'"
         ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: 'ApiGatewayRestApi'

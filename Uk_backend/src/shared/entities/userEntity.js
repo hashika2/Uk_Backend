@@ -17,6 +17,10 @@ const userEntity = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      userId:{
+        type: DataTypes.STRING(255),
+        allowNull: false,
+      },
       username: {
         type: DataTypes.STRING(255),
         allowNull: false,
