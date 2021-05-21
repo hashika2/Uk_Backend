@@ -22,6 +22,11 @@ provider:
   region: us-east-1
   environment:
     STAGE: ${self:provider.stage}
+  iamRoleStatments:
+    - Effect: Allow
+    - Action: 
+        - s3:*
+        - ses:*
 
 functions:
   setDate:
@@ -29,6 +34,18 @@ functions:
     events:
       - http:
           path: book/date
+          method: get
+          cors:
+          origin: '*'
+          headers:
+            - content-type
+            - authorization
+
+  sendEmail:
+    handler: index.sendEmail
+    events:
+      - http:
+          path: book/email
           method: post
           cors:
           origin: '*'

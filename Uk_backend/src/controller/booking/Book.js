@@ -9,7 +9,7 @@ const { bookingAttributes } = require("./bookingAttributesValidation");
  * Author: Hashika
  * Date: 18/05/2021
  * Copyright © 2021 BookingSite. All rights reserved.
- *
+ * 
  * Book Entity
  */
 const BookDate = async (event) => {
@@ -42,17 +42,16 @@ const BookDate = async (event) => {
         validateResult.error.details[0].message
       );
     }
-    // check autherization
-    // const autherize = await authorizationService(event);
-    // print(`*************${autherize}`)
-    // if (autherize.statusCode == 500) {
-    //   return {
-    //     body: JSON.stringify({
-    //       error: "UnAutherized",
-    //     }),
-    //     statusCode:STATUS_CODE.UNAUTHERIZED
-    //   };
-    // }
+    /** check autherization **/
+    const autherize = await (await authorizationService(event));
+    if ((autherize.statusCode) !== 200) {
+      return {
+        body: JSON.stringify({
+          error: autherize.body,
+        }),
+        statusCode: STATUS_CODE.UNAUTHERIZED,
+      };
+    }
     return await BookService(id,requestBody);
   } catch (error) {
     return {

@@ -3,11 +3,12 @@ const jwt = require("jsonwebtoken");
 const request = require("request");
 const jwkToPem = require("jwk-to-pem");
 // const pem = jwkToPem(jwk.keys[1]);
+const Verifier = require("verify-cognito-token");
 
 const authorizationService = async (event) => {
-  const authHeader = event.headers.Authorization;
-  const token = authHeader.split(" ")[1];
   try {
+    const authHeader = event.headers.Authorization;
+    const token = authHeader.split(" ")[1];
     return {
       body: JSON.stringify(
         await new Promise((resolve, reject) => {
@@ -62,6 +63,7 @@ const authorizationService = async (event) => {
           );
         })
       ),
+      statusCode: STATUS_CODE.SUCCESS,
     };
   } catch (err) {
     return {
@@ -72,5 +74,34 @@ const authorizationService = async (event) => {
     };
   }
 };
+
+// const authorizationService =async (event) => {
+//   const authHeader = event.headers.Authorization;
+//   const token = authHeader.split(" ")[1];
+//   try{
+//     const params = {
+//       region: 'us-east-1',  // required
+//       userPoolId: 'us-east-1_sI9rWGwiz', // required
+//       debug: true // optional parameter to show console logs
+//     }
+
+//     const claims = {
+//       aud: '2lkjm717aaenjk1gaplh9pql8t',
+//       email_verified: true,
+//       auth_time: time => time <= 1621326003,
+//       'cognito:username': groups => groups.includes('709492fd-7ee9-4c0a-ba4a-b83f04534f34')
+//     }
+//   console.log("***********")
+//   const verifier = new Verifier(params, claims);
+//   console.log("*****123******")
+
+//   const result = await verifier.verify(token)
+//   console.log(result);
+
+//   }catch(err){
+//     print(err)
+//   }
+
+// }
 
 module.exports = authorizationService;
