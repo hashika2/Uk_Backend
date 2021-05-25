@@ -52,6 +52,18 @@ functions:
           headers:
             - content-type
             - authorization
+  
+  bookingPrice:
+    handler: index.bookingPrice
+    events:
+      - http:
+          path: book/price
+          method: get
+          cors:
+          origin: '*'
+          headers:
+            - content-type
+            - authorization
 
 # you can add CloudFormation resource templates here
 resources:

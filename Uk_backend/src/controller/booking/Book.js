@@ -1,7 +1,7 @@
 const { STATUS_CODE, ERROR_MESSAGE } = require("../../shared/constant");
 const { responseBuilder } = require("../../shared/responseBuilder");
 const { validateHeader } = require("../../shared/validateHeaders");
-const BookService = require("../../services/BookService");
+const {BookService, BookingPriceService} = require("../../services/BookService");
 const authorizationService = require("../../services/authorizationService");
 const { bookingAttributes } = require("./bookingAttributesValidation");
 
@@ -61,4 +61,23 @@ const BookDate = async (event) => {
   }
 };
 
-module.exports = { BookDate };
+const BookPrice = async (event) => {
+  try {
+    const validity = validateHeader(event);
+    if (!validity) {
+      return responseBuilder(
+        STATUS_CODE.BAD_REQUEST,
+        ERROR_MESSAGE.CUSTOM_HEADERS
+      );
+    }
+
+    return await BookingPriceService();
+  } catch (error) {
+    return {
+      body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
+  }
+};
+
+module.exports = { BookDate, BookPrice };

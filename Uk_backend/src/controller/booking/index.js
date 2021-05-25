@@ -1,5 +1,5 @@
 "use strict";
-const { BookDate } = require("./Book");
+const { BookDate, BookPrice } = require("./Book");
 /*
  * Author: Hashika
  * Date: 18/05/2021
@@ -9,6 +9,10 @@ const { BookDate } = require("./Book");
  */
 module.exports.setDate = async (event) => {
   return await BookDate(event);
+};
+
+module.exports.bookingPrice = async (event) => {
+  return await BookPrice(event);
 };
 
 const AWS = require("aws-sdk");
