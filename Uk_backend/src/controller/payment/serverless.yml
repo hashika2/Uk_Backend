@@ -1,0 +1,62 @@
+service: payment
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+custom:
+  envFilePath: ../../../shared/environment/env.json
+  webpack:
+    webpackConfig: '../../../webpack.config.js'   # Name of webpack configuration file
+    includeModules:
+      packagePath: ../../../package.json
+      forceExclude:
+        - aws-sdk   # Node modules configuration for packaging
+    packager: 'npm'   # Packager that will be used to package your external modules
+    # excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  environment:
+    STAGE: ${self:provider.stage}
+  iamRoleStatments:
+    - Effect: Allow
+    - Action: 
+        - s3:*
+        - ses:*
+
+functions:
+  checkPaymentType:
+    handler: index.checkPaymentType
+    events:
+      - http:
+          path: payment/check_type
+          method: get
+          cors:
+          origin: '*'
+          headers:
+            - content-type
+            - authorization
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'content-type,authorization'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+
+package:
+  individually: true
