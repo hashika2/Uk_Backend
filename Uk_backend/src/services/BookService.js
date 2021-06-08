@@ -4,7 +4,11 @@ const {
   ClientIdExtend,
   UserPoolIdExtend,
 } = require("../shared/environment/env.json");
-const { bookingDate, checkBooking } = require("../shared/repositories/TimeBookingRepo");
+const {
+  bookingDate,
+  getbookingDate,
+  checkBooking,
+} = require("../shared/repositories/TimeBookingRepo");
 
 const poolData = {
   ClientId: ClientIdExtend,
@@ -21,13 +25,13 @@ const poolData = {
 const BookService = async (id, requestBody) => {
   try {
     const isExist = await checkBooking(id);
-    if(isExist){
-      return{
-        body:JSON.stringify({
-          error:"User Already Book"
+    if (isExist) {
+      return {
+        body: JSON.stringify({
+          error: "User Already Book",
         }),
         statusCode: STATUS_CODE.BAD_REQUEST,
-      }
+      };
     }
     const userDetails = await bookingDate(id, requestBody);
     return { body: JSON.stringify(userDetails) };
@@ -39,4 +43,58 @@ const BookService = async (id, requestBody) => {
   }
 };
 
-module.exports = BookService;
+const SendBookService = async () => {
+  try {
+    const bookingDate = await getbookingDate();
+    return { body: JSON.stringify(bookingDate) };
+  } catch (error) {
+    return {
+      body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
+  }
+};
+
+const BookingPriceService = () => {
+  try {
+    return {
+      body: JSON.stringify({
+        basePrice: {
+          USD: {
+            twoDayBlock: "25",
+            splitService: "30",
+          },
+          GBP: {
+            twoDayBlock: "25",
+            splitService: "30",
+          },
+          EUR: {
+            twoDayBlock: "25",
+            splitService: "30",
+          },
+        },
+        rest: {
+          USD: {
+            twoDayBlock: "55",
+            splitService: "60",
+          },
+          GBP: {
+            twoDayBlock: "55",
+            splitService: "60",
+          },
+          EUR: {
+            twoDayBlock: "55",
+            splitService: "60",
+          },
+        },
+      }),
+    };
+  } catch (err) {
+    return {
+      body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
+  }
+};
+
+module.exports = { BookService, SendBookService, BookingPriceService };

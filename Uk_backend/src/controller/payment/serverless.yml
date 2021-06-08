@@ -1,4 +1,4 @@
-service: date
+service: payment
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -29,46 +29,11 @@ provider:
         - ses:*
 
 functions:
-  setDate:
-    handler: index.setDate
+  checkPaymentType:
+    handler: index.checkPaymentType
     events:
       - http:
-          path: book/date
-          method: post
-          cors:
-          origin: '*'
-          headers:
-            - content-type
-            - authorization
-
-  bookDate:
-    handler: index.bookDate
-    events:
-      - http:
-          path: book/date
-          method: get
-          cors:
-          origin: '*'
-          headers:
-            - content-type
-
-  sendEmail:
-    handler: index.sendEmail
-    events:
-      - http:
-          path: book/email
-          method: post
-          cors:
-          origin: '*'
-          headers:
-            - content-type
-            - authorization
-  
-  bookingPrice:
-    handler: index.bookingPrice
-    events:
-      - http:
-          path: book/price
+          path: payment/check_type
           method: get
           cors:
           origin: '*'
