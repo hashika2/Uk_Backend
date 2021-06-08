@@ -34,12 +34,23 @@ functions:
     events:
       - http:
           path: book/date
-          method: get
+          method: post
           cors:
           origin: '*'
           headers:
             - content-type
             - authorization
+
+  bookDate:
+    handler: index.bookDate
+    events:
+      - http:
+          path: book/date
+          method: get
+          cors:
+          origin: '*'
+          headers:
+            - content-type
 
   sendEmail:
     handler: index.sendEmail

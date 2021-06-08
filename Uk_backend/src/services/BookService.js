@@ -6,6 +6,7 @@ const {
 } = require("../shared/environment/env.json");
 const {
   bookingDate,
+  getbookingDate,
   checkBooking,
 } = require("../shared/repositories/TimeBookingRepo");
 
@@ -42,37 +43,49 @@ const BookService = async (id, requestBody) => {
   }
 };
 
+const SendBookService = async () => {
+  try {
+    const bookingDate = await getbookingDate();
+    return { body: JSON.stringify(bookingDate) };
+  } catch (error) {
+    return {
+      body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
+  }
+};
+
 const BookingPriceService = () => {
   try {
     return {
       body: JSON.stringify({
         basePrice: {
-          USD:{
+          USD: {
             twoDayBlock: "25",
             splitService: "30",
           },
-          GBP:{
+          GBP: {
             twoDayBlock: "25",
             splitService: "30",
           },
-          EUR:{
+          EUR: {
             twoDayBlock: "25",
             splitService: "30",
-          }
+          },
         },
         rest: {
-          USD:{
+          USD: {
             twoDayBlock: "55",
             splitService: "60",
           },
-          GBP:{
+          GBP: {
             twoDayBlock: "55",
             splitService: "60",
           },
-          EUR:{
+          EUR: {
             twoDayBlock: "55",
             splitService: "60",
-          }
+          },
         },
       }),
     };
@@ -84,4 +97,4 @@ const BookingPriceService = () => {
   }
 };
 
-module.exports = { BookService, BookingPriceService };
+module.exports = { BookService, SendBookService, BookingPriceService };

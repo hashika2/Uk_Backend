@@ -15,10 +15,17 @@ const bookingDate = async (clientId, requestBody) => {
   return book;
 };
 
+const getbookingDate = async () => {
+  const bookDate = await User_Booking.findAll({
+    attributes:['firstDate','secondDate']
+  });
+  return bookDate;
+}
+
 const checkBooking = async (id) => {
   const isExist = await User_Booking.count({ where: { userId: id } });
   if (isExist > 0) return true;
   else return false;
 };
 
-module.exports = { bookingDate, checkBooking };
+module.exports = { bookingDate, checkBooking, getbookingDate };

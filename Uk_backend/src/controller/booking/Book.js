@@ -1,7 +1,7 @@
 const { STATUS_CODE, ERROR_MESSAGE } = require("../../shared/constant");
 const { responseBuilder } = require("../../shared/responseBuilder");
 const { validateHeader } = require("../../shared/validateHeaders");
-const {BookService, BookingPriceService} = require("../../services/BookService");
+const {BookService, SendBookService, BookingPriceService} = require("../../services/BookService");
 const authorizationService = require("../../services/authorizationService");
 const { bookingAttributes } = require("./bookingAttributesValidation");
 
@@ -12,7 +12,7 @@ const { bookingAttributes } = require("./bookingAttributesValidation");
  * 
  * Book Entity
  */
-const BookDate = async (event) => {
+const SetDate = async (event) => {
   try {
     const validity = validateHeader(event);
     if (!validity) {
@@ -62,6 +62,25 @@ const BookDate = async (event) => {
   }
 };
 
+const BookDate = async (event) => {
+  try {
+    const validity = validateHeader(event);
+    if (!validity) {
+      return responseBuilder(
+        STATUS_CODE.BAD_REQUEST,
+        ERROR_MESSAGE.CUSTOM_HEADERS
+      );
+    }
+
+    return await SendBookService();
+  } catch (error) {
+    return {
+      body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
+  }
+};
+
 const BookPrice = async (event) => {
   try {
     const validity = validateHeader(event);
@@ -81,4 +100,4 @@ const BookPrice = async (event) => {
   }
 };
 
-module.exports = { BookDate, BookPrice };
+module.exports = { SetDate, BookDate, BookPrice };
