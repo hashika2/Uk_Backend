@@ -1,7 +1,7 @@
 const { User_Booking } = require("../entities");
 
 const bookingDate = async (clientId, requestBody) => {
-  const { firstDate, secondDate, country, city, status } = requestBody;
+  const { firstDate, secondDate, country, city, status, clientType } = requestBody;
   const book = await User_Booking.create({
     userId: clientId,
     firstDate: firstDate,
@@ -9,6 +9,7 @@ const bookingDate = async (clientId, requestBody) => {
     country: country,
     city: city,
     state: status,
+    clientType: clientType
   });
   await book.save();
   return book;

@@ -40,6 +40,10 @@ const timeBookingEntity = (sequelize, DataTypes) => {
       state: {
         type: DataTypes.STRING(50),
         allowNull: false,
+      },
+      clientType:{
+        type: DataTypes.STRING(50),
+        allowNull: false,
       }
     },
     {

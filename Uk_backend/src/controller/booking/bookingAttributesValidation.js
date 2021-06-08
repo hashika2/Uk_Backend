@@ -7,6 +7,7 @@ const secondDate = Joi.string().required();
 const country = Joi.string().required();
 const city = Joi.string().required();
 const status = Joi.string().required();
+const clientType = Joi.string().required();
 
 const bookingAttributes = (insertAttributes) => {
   const schema = {
@@ -16,6 +17,7 @@ const bookingAttributes = (insertAttributes) => {
     country,
     city,
     status,
+    clientType
   };
   return validateObject(schema, insertAttributes);
 };

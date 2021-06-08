@@ -27,7 +27,7 @@ const BookDate = async (event) => {
       return responseBuilder(STATUS_CODE.BAD_REQUEST, ERROR_MESSAGE.EMPTY_BODY);
     }
     const { id } = event.queryStringParameters;
-    const { firstDate, secondDate, country, city, status } = requestBody;
+    const { firstDate, secondDate, country, city, status, clientType } = requestBody;
     const validateResult = bookingAttributes({
       id,
       firstDate,
@@ -35,6 +35,7 @@ const BookDate = async (event) => {
       country,
       city,
       status,
+      clientType
     });
     if (validateResult.error) {
       return responseBuilder(
