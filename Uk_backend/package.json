@@ -1,11 +1,14 @@
 {
   "name": "Uk_backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "aws lamdha functions",
   "main": "index.js",
   "scripts": {
     "lint": "eslint **/*.js --ignore-pattern node_modules/ --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "formatU": "prettier-eslint '**/*.{js,json}' --write",
+    "formatW": "prettier-eslint --ignore \"./node_modules/**\" --write \"./**/*.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "cd ../../ && index.js"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +32,11 @@
     "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.14.2",
+    "@babel/plugin-transform-regenerator": "^7.13.15",
+    "@babel/plugin-transform-runtime": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "babel-loader": "^8.2.2",
     "serverless-webpack": "^5.4.2",
     "webpack": "^5.36.2"
   }
