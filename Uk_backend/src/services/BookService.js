@@ -8,6 +8,8 @@ const {
   bookingDate,
   getbookingDate,
   checkBooking,
+  getBookDate,
+  updateExpiry,
 } = require("../shared/repositories/TimeBookingRepo");
 
 const poolData = {
@@ -97,4 +99,48 @@ const BookingPriceService = () => {
   }
 };
 
-module.exports = { BookService, SendBookService, BookingPriceService };
+const CheckExpiryService = async (id) => {
+  const isExist = await checkBooking(id);
+  if (!isExist) {
+    return {
+      body: JSON.stringify({
+        error: "Id is not match for user",
+      }),
+      statusCode: STATUS_CODE.BAD_REQUEST,
+    };
+  }
+  const getBookDates = await getBookDate(id);
+  if (getBookDates) {
+    const isExpiry = await _checkExpiryDate(getBookDates);
+    if (isExpiry) {
+      //update the user state to expire
+      await updateExpiry(id, "Expired");
+      return {
+        body: JSON.stringify({ expiry: "Expired" }),
+      };
+    }
+    return {
+      body: JSON.stringify({ expiry: "Active" }),
+    };
+  } else
+    return {
+      body: JSON.stringify({ error: "Data is null " }),
+      statusCode: STATUS_CODE.BAD_REQUEST,
+    };
+};
+
+const _checkExpiryDate = (getBookDates) => {
+  const firstDate = parseInt(getBookDates.firstDate);
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const currentDay = parseInt(dd);
+  if (currentDay < firstDate) return false;
+  else return true;
+};
+
+module.exports = {
+  BookService,
+  SendBookService,
+  BookingPriceService,
+  CheckExpiryService,
+};

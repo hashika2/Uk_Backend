@@ -22,4 +22,9 @@ const bookingAttributes = (insertAttributes) => {
   return validateObject(schema, insertAttributes);
 };
 
-module.exports = { bookingAttributes };
+const IdAttriubute = (insertAttribute) => {
+  const schema = {id}
+  return validateObject(schema,insertAttribute);
+}
+
+module.exports = { bookingAttributes, IdAttriubute };

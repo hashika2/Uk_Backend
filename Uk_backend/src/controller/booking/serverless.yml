@@ -52,6 +52,18 @@ functions:
           headers:
             - content-type
 
+  checkExpiry:
+    handler: index.checkExpiry
+    events:
+      - http:
+          path: book/expire
+          method: get
+          cors:
+          origin: '*'
+          headers:
+            - content-type
+            - authorization
+
   sendEmail:
     handler: index.sendEmail
     events:

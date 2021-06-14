@@ -44,6 +44,10 @@ const timeBookingEntity = (sequelize, DataTypes) => {
       clientType:{
         type: DataTypes.STRING(50),
         allowNull: false,
+      },
+      expiry:{
+        type: DataTypes.STRING(20),
+        allowNull: false,
       }
     },
     {
