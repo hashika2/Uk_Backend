@@ -1,5 +1,5 @@
 "use strict";
-const { SetDate, BookDate, BookPrice, CheckExpiry } = require("./Book");
+const { SetDate, BookDate, BookPrice, BookState, CheckExpiry } = require("./Book");
 const nodemailer = require('nodemailer');
 /*
  * Author: Hashika
@@ -19,6 +19,10 @@ module.exports.bookDate = async (event) => {
 module.exports.bookingPrice = async (event) => {
   return await BookPrice(event);
 };
+
+module.exports.bookState = async (event) => {
+  return await BookState(event);
+}
 
 
 module.exports.checkExpiry = async (event) => {

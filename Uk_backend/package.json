@@ -7,7 +7,7 @@
     "lint": "eslint **/*.js --ignore-pattern node_modules/ --fix",
     "formatU": "prettier-eslint '**/*.{js,json}' --write",
     "formatW": "prettier-eslint --ignore \"./node_modules/**\" --write \"./**/*.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "server": "cd ../../ && index.js"
   },
   "keywords": [],
@@ -37,6 +37,7 @@
     "@babel/plugin-transform-runtime": "^7.14.3",
     "@babel/preset-env": "^7.14.4",
     "babel-loader": "^8.2.2",
+    "jest": "^27.0.5",
     "serverless-webpack": "^5.4.2",
     "webpack": "^5.36.2"
   }

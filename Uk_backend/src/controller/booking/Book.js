@@ -1,15 +1,24 @@
 const { STATUS_CODE, ERROR_MESSAGE } = require("../../shared/constant");
 const { responseBuilder } = require("../../shared/responseBuilder");
 const { validateHeader } = require("../../shared/validateHeaders");
-const {BookService, SendBookService, BookingPriceService, CheckExpiryService} = require("../../services/BookService");
+const {
+  BookService,
+  SendBookService,
+  BookingPriceService,
+  BookStateService,
+  CheckExpiryService,
+} = require("../../services/BookService");
 const authorizationService = require("../../services/authorizationService");
-const { bookingAttributes, IdAttriubute } = require("./bookingAttributesValidation");
+const {
+  bookingAttributes,
+  IdAttriubute,
+} = require("./bookingAttributesValidation");
 
 /*
  * Author: Hashika
  * Date: 18/05/2021
  * Copyright © 2021 BookingSite. All rights reserved.
- * 
+ *
  * Book Entity
  */
 const SetDate = async (event) => {
@@ -27,7 +36,14 @@ const SetDate = async (event) => {
       return responseBuilder(STATUS_CODE.BAD_REQUEST, ERROR_MESSAGE.EMPTY_BODY);
     }
     const { id } = event.queryStringParameters;
-    const { firstDate, secondDate, country, city, status, clientType } = requestBody;
+    const {
+      firstDate,
+      secondDate,
+      country,
+      city,
+      status,
+      clientType,
+    } = requestBody;
     const validateResult = bookingAttributes({
       id,
       firstDate,
@@ -35,8 +51,9 @@ const SetDate = async (event) => {
       country,
       city,
       status,
-      clientType
+      clientType,
     });
+    
     if (validateResult.error) {
       return responseBuilder(
         STATUS_CODE.BAD_REQUEST,
@@ -44,8 +61,8 @@ const SetDate = async (event) => {
       );
     }
     /** check autherization **/
-    const autherize = await (await authorizationService(event));
-    if ((autherize.statusCode) !== 200) {
+    const autherize = await await authorizationService(event);
+    if (autherize.statusCode !== 200) {
       return {
         body: JSON.stringify({
           error: autherize.body,
@@ -53,7 +70,7 @@ const SetDate = async (event) => {
         statusCode: STATUS_CODE.UNAUTHERIZED,
       };
     }
-    return await BookService(id,requestBody);
+    return await BookService(id, requestBody);
   } catch (error) {
     return {
       body: JSON.stringify(error),
@@ -76,6 +93,43 @@ const BookDate = async (event) => {
   } catch (error) {
     return {
       body: JSON.stringify(error),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
+  }
+};
+
+const BookState = async (event) => {
+  try {
+    const validity = validateHeader(event);
+    if (!validity) {
+      return responseBuilder(
+        STATUS_CODE.BAD_REQUEST,
+        ERROR_MESSAGE.CUSTOM_HEADERS
+      );
+    }
+    const { id } = event.queryStringParameters;
+    const validateResult = IdAttriubute({ id });
+    if (validateResult.error) {
+      return responseBuilder(
+        STATUS_CODE.BAD_REQUEST,
+        validateResult.error.details[0].message
+      );
+    }
+    /** check autherization **/
+    const autherize = await await authorizationService(event);
+    if (autherize.statusCode !== 200) {
+      return {
+        body: JSON.stringify({
+          error: autherize.body,
+        }),
+        statusCode: STATUS_CODE.UNAUTHERIZED,
+      };
+    }
+
+    return await BookStateService(id);
+  } catch (err) {
+    return {
+      body: JSON.stringify(err),
       statusCode: STATUS_CODE.SERVER_ERROR,
     };
   }
@@ -121,8 +175,8 @@ const CheckExpiry = async (event) => {
       );
     }
     /** check autherization **/
-    const autherize = await (await authorizationService(event));
-    if ((autherize.statusCode) !== 200) {
+    const autherize = await await authorizationService(event);
+    if (autherize.statusCode !== 200) {
       return {
         body: JSON.stringify({
           error: autherize.body,
@@ -139,4 +193,4 @@ const CheckExpiry = async (event) => {
   }
 };
 
-module.exports = { SetDate, BookDate, BookPrice, CheckExpiry };
+module.exports = { SetDate, BookDate, BookPrice, BookState, CheckExpiry };

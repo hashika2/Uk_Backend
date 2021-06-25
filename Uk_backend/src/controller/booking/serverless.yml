@@ -51,6 +51,18 @@ functions:
           origin: '*'
           headers:
             - content-type
+  
+  bookState:
+    handler: index.bookState
+    events:
+      - http:
+          path: book/date/state
+          method: get
+          cors:
+          origin: '*'
+          headers:
+            - content-type
+            - authorization
 
   checkExpiry:
     handler: index.checkExpiry
