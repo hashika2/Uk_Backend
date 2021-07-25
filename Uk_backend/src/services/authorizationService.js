@@ -14,7 +14,7 @@ const authorizationService = async (event) => {
         await new Promise((resolve, reject) => {
           request(
             {
-              url: `https://cognito-idp.us-east-1.amazonaws.com/us-east-1_sI9rWGwiz/.well-known/jwks.json`,
+              url: `https://cognito-idp.us-east-1.amazonaws.com/us-east-1_Nv92dj9JN/.well-known/jwks.json`,
               json: true,
             },
             function (error, response, body) {
