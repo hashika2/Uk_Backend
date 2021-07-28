@@ -1,5 +1,8 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
 const passwordHash = require("password-hash");
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
+const { uuid } = require('uuidv4');
 const { STATUS_CODE } = require("../shared/constant");
 const { user } = require("../shared/environment");
 const {
@@ -11,6 +14,7 @@ const {
 const {
   createUser,
   checkUserExist,
+  getUserId,
 } = require("../shared/repositories/UserRepo");
 
 const poolData = {
@@ -90,6 +94,39 @@ const RegisterService = async ({
               //   };
               // }
               resolve(data.user);
+          userPool.signUp(
+            email,
+            password,
+            attributeList,
+            null,
+            async (err, data) => {
+              if (err) {
+                console.log(err);
+                reject(err);
+              } else {
+                const hashPassword = passwordHash.generate(password);
+                console.log(`************${data.user.pool.clientId}`);
+                const clientId = data.user.pool.clientId;
+                await createUser(
+                  email,
+                  uuid(),
+                  hashPassword,
+                  username,
+                  company,
+                  address,
+                  phone
+                );
+
+                // if (!signIn.isNewRecord) {
+                //   return {
+                //     statusCode: STATUS_CODE.SERVER_ERROR,
+                //     body: JSON.stringify({
+                //       error: "User is not added to database",
+                //     }),
+                //   };
+                // }
+                resolve(data.user);
+              }
             }
           });
         })
@@ -123,14 +160,17 @@ const LoginService = async (email, password) => {
       body: JSON.stringify(
         await new Promise((resolve, reject) => {
           cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: function (session) {
+            onSuccess: async function (session) {
               const tokens = {
                 accessToken: session.getAccessToken().getJwtToken(),
                 idToken: session.getIdToken().getJwtToken(),
                 refreshToken: session.getRefreshToken().getToken(),
               };
+              const userId = await getUserId(email);
+              console.log('********',userId)
               cognitoUser["tokens"] = tokens; // Save tokens for later use  2lkjm717aaenjk1gaplh9pql8t
-              resolve({                                                     
+              resolve({
+                userId: userId,
                 accessToken: cognitoUser.signInUserSession.accessToken,
                 refreshToken: cognitoUser.signInUserSession.refreshToken
               });

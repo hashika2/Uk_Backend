@@ -32,4 +32,8 @@ const getUserDetails = async(email,id)=>{
   return await User.findOne({where:{userId:id}})
 }
 
-module.exports = { createUser, checkUserExist, getUserDetails };
+const getUserId = async(email)=>{
+  return await User.findOne({where:{email:email},attributes: ['userId']})
+}
+
+module.exports = { createUser, checkUserExist, getUserDetails, getUserId };

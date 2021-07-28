@@ -1,4 +1,5 @@
 const AmozonCognitoIdentity = require("amazon-cognito-identity-js");
+const nodemailer = require("nodemailer");
 const { STATUS_CODE } = require("../shared/constant");
 const {
   ClientIdExtend,
@@ -9,6 +10,8 @@ const {
   getbookingDate,
   checkBooking,
 } = require("../shared/repositories/TimeBookingRepo");
+const host = require('../shared/environment/env.json');
+const sendEmailWithPdf = require("../controller/mails/emailWithPdf");
 
 const poolData = {
   ClientId: ClientIdExtend,
@@ -34,6 +37,31 @@ const BookService = async (id, requestBody) => {
       };
     }
     const userDetails = await bookingDate(id, requestBody);
+    // await sendEmailWithPdf();
+    // let transport = await nodemailer.createTransport({
+    //   host: "smtp.office365.com",
+    //   port: 587,
+    //   auth: {
+    //     user: process.env.HOST_USER,
+    //     pass: process.env.HOST_PASSWORD,
+    //   },
+    // });
+
+    // const message = {
+    //   from: host.mail.user, 
+    //   to: email,
+    //   subject: "Booking Status",
+    //   text: "You have booked a day, Thank You!",
+    // };
+
+    // await transport.sendMail(message, function (err, info) {
+    //   if (err) {
+    //     console.log(err);
+    //   } else {
+    //     console.log(info);
+    //   }
+    // });
+
     return { body: JSON.stringify(userDetails) };
   } catch (error) {
     return {
@@ -54,6 +82,26 @@ const SendBookService = async () => {
     };
   }
 };
+
+const BookStateService = async (id) => {
+  try{
+    const isExist = await checkBooking(id);
+    if (isExist) {
+      return {
+        body: JSON.stringify({
+          message: "User Already Booked",
+          state: true
+        }),
+        statusCode: STATUS_CODE.BAD_REQUEST,
+      };
+    }
+  }catch(err){
+    return {
+      body: JSON.stringify(err),
+      statusCode: STATUS_CODE.SERVER_ERROR,
+    };
+  }
+}
 
 const BookingPriceService = () => {
   try {
@@ -98,3 +146,49 @@ const BookingPriceService = () => {
 };
 
 module.exports = { BookService, SendBookService, BookingPriceService };
+const CheckExpiryService = async (id) => {
+  const isExist = await checkBooking(id);
+  if (!isExist) {
+    return {
+      body: JSON.stringify({
+        error: "Id is not match for user",
+      }),
+      statusCode: STATUS_CODE.BAD_REQUEST,
+    };
+  }
+  const getBookDates = await getBookDate(id);
+  if (getBookDates) {
+    const isExpiry = await _checkExpiryDate(getBookDates);
+    if (isExpiry) {
+      //update the user state to expire
+      await updateExpiry(id, "Expired");
+      return {
+        body: JSON.stringify({ expiry: "Expired" }),
+      };
+    }
+    return {
+      body: JSON.stringify({ expiry: "Active" }),
+    };
+  } else
+    return {
+      body: JSON.stringify({ error: "Data is null " }),
+      statusCode: STATUS_CODE.BAD_REQUEST,
+    };
+};
+
+const _checkExpiryDate = (getBookDates) => {
+  const firstDate = parseInt(getBookDates.firstDate);
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const currentDay = parseInt(dd);
+  if (currentDay < firstDate) return false;
+  else return true;
+};
+
+module.exports = {
+  BookService,
+  SendBookService,
+  BookingPriceService,
+  BookStateService,
+  CheckExpiryService,
+};
